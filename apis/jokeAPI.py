@@ -10,5 +10,3 @@ def extract_info(response):
     bromita = {}
     bromita["chiste"] = response["joke"]
     return bromita
-
-print(extract_info(load_json()))

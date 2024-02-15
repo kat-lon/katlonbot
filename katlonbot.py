@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+from apis import meteoAPI
 
 load_dotenv()
 # Authentication to manage the bot
@@ -18,6 +19,14 @@ logging.basicConfig(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Son un bot, dime algo!")
 
+async def tiempo_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    tiempo = meteoAPI.extract_info(meteoAPI.load_json())
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=tiempo["title"]+":")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=tiempo["hoy"])
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Cielo: " + tiempo["cielo"])
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Temperatura máxima: {tiempo['temp_max']}ºC\n"+
+                                                                          f"Temperatura mínima: {tiempo['temp_min']}ºC")
+
 if __name__ == '__main__':
     # Start the application to operate the bot
     application = ApplicationBuilder().token(TOKEN).build()
@@ -25,6 +34,9 @@ if __name__ == '__main__':
     # Handler to manage the start command
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
+
+    tiempo_handler = CommandHandler('tiempo', tiempo_api)
+    application.add_handler(tiempo_handler)
     
     # Keeps the application running
     application.run_polling()

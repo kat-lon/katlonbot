@@ -18,5 +18,3 @@ def extract_info(response):
     apod["imagen"] = response["url"]
     return apod
 
-api_key = get_apikey()
-print(extract_info(load_json(api_key)))

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from apis import meteoAPI
+from apis import jokeAPI
 
 load_dotenv()
 # Authentication to manage the bot
@@ -26,6 +27,10 @@ async def tiempo_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Cielo: " + tiempo["cielo"])
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Temperatura máxima: {tiempo['temp_max']}ºC\n"+
                                                                           f"Temperatura mínima: {tiempo['temp_min']}ºC")
+    
+async def chiste_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chiste = jokeAPI.extract_info(jokeAPI.load_json())
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=chiste["chiste"])
 
 if __name__ == '__main__':
     # Start the application to operate the bot
@@ -37,6 +42,9 @@ if __name__ == '__main__':
 
     tiempo_handler = CommandHandler('tiempo', tiempo_api)
     application.add_handler(tiempo_handler)
-    
+
+    chiste_handler = CommandHandler('chiste', chiste_api)
+    application.add_handler(chiste_handler)
+
     # Keeps the application running
     application.run_polling()

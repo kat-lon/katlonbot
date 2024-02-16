@@ -1,9 +1,13 @@
 import logging
 import os
+import json
+import csv
+import requests
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from apis import meteoAPI, jokeAPI, apodAPI
+from csv_json import csv_json
 
 load_dotenv()
 # Authentication to manage the bot
@@ -37,6 +41,16 @@ async def apod_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_photo(chat_id=update.effective_chat.id, photo=apod["imagen"])
     await context.bot.send_message(chat_id=update.effective_chat.id, text=apod["descripcion"])
 
+async def handle_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file = update.message.document.to_dict()
+    
+    await context.bot.send_document(chat_id=update.effective_chat.id, document=new_json)
+
+async def handle_json(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    json_file = update.message.document.get_file()
+    json_data = json.loads(json_file.decode('utf-8'))
+    
+
 if __name__ == '__main__':
     # Start the application to operate the bot
     application = ApplicationBuilder().token(TOKEN).build()
@@ -53,6 +67,12 @@ if __name__ == '__main__':
 
     apod_handler = CommandHandler('apod', apod_api)
     application.add_handler(apod_handler)
+
+    csv_handler = MessageHandler(filters.Document.FileExtension("csv"), handle_csv)
+    application.add_handler(csv_handler)
+
+    json_handler = MessageHandler(filters.Document.FileExtension("json"), handle_json)
+    application.add_handler(json_handler)
 
     # Keeps the application running
     application.run_polling()

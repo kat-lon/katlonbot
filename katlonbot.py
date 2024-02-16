@@ -42,9 +42,9 @@ async def apod_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=apod["descripcion"])
 
 async def handle_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    file = update.message.document.to_dict()
-    
-    await context.bot.send_document(chat_id=update.effective_chat.id, document=new_json)
+    file = await context.bot.get_file(update.message.document)
+    filename = update.message.document.file_name
+    await file.download_to_drive(filename)
 
 async def handle_json(update: Update, context: ContextTypes.DEFAULT_TYPE):
     json_file = update.message.document.get_file()

@@ -8,4 +8,6 @@ def scrapping_periodico():
 
     portada = soup.find("div", class_="wrapper-tree-columns first-wrapper aperture-wrapper")
     articulos_portada = portada.find_all("h2", class_="title")
-    return [{"titular":articulo.find("a").contents[0], "enlace":url + articulo.find("a").get("href")} for articulo in articulos_portada]
+    return [{"titular":articulo.find("a").contents[0], 
+             "enlace":url + articulo.find("a").get("href")}
+             for articulo in articulos_portada]

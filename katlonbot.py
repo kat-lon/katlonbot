@@ -76,6 +76,19 @@ async def handle_noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for noticia in portada:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{noticia['titular']}\n{noticia['enlace']}")
 
+async def handle_noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    portada = periodico.scrapping_periodico()
+    for noticia in portada:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{noticia['titular']}\n{noticia['enlace']}")
+
+async def handle_peliculas(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    peliculas_hoy = cartelera.scrapping_periodico()
+    for pelicula in peliculas_hoy:
+        await context.bot.send_photo(chat_id=update.effective_chat.id,
+                                     photo=pelicula["imagen"],
+                                     caption=f"{pelicula['titulo']}\n{pelicula['enlace']}")
+
+
 if __name__ == '__main__':
     # Start the application to operate the bot
     application = ApplicationBuilder().token(TOKEN).build()
@@ -95,6 +108,9 @@ if __name__ == '__main__':
 
     noticias_handler = CommandHandler('noticias', handle_noticias)
     application.add_handler(noticias_handler)
+
+    peliculas_handler = CommandHandler('peliculas', handle_peliculas)
+    application.add_handler(peliculas_handler)
 
     csv_handler = MessageHandler(filters.Document.FileExtension("csv"), handle_csv)
     application.add_handler(csv_handler)

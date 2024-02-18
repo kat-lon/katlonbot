@@ -8,6 +8,7 @@ from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from apis import meteoAPI, jokeAPI, apodAPI
 from csv_json import csv_json
+from scraping import periodico, cartelera
 
 load_dotenv()
 # Authentication to manage the bot
@@ -70,6 +71,10 @@ async def handle_json(update: Update, context: ContextTypes.DEFAULT_TYPE):
     os.remove(filepath)
     os.remove(archivo_csv)
     
+async def handle_noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    portada = periodico.scrapping_periodico()
+    for noticia in portada:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{noticia['titular']}\n{noticia['enlace']}")
 
 if __name__ == '__main__':
     # Start the application to operate the bot
@@ -87,6 +92,9 @@ if __name__ == '__main__':
 
     apod_handler = CommandHandler('apod', apod_api)
     application.add_handler(apod_handler)
+
+    noticias_handler = CommandHandler('noticias', handle_noticias)
+    application.add_handler(noticias_handler)
 
     csv_handler = MessageHandler(filters.Document.FileExtension("csv"), handle_csv)
     application.add_handler(csv_handler)

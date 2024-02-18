@@ -18,5 +18,7 @@ def csv_to_json(dataframe, ruta):
 def get_csv_info(archivo_csv):
     buffer = io.StringIO()
     archivo_csv.info(buf=buffer)
-    info = buffer.getvalue()
-    return info
+    info_output = buffer.getvalue().splitlines()[2:-2]
+    info_output = "\n".join([line.rstrip() for line in info_output])
+    estadisticas = str(archivo_csv.describe())
+    return info_output, estadisticas

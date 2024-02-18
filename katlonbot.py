@@ -47,7 +47,9 @@ async def handle_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await file.download_to_drive(filepath)
 
     df = csv_json.convert_to_dataframe(filepath)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=csv_json.get_csv_info(df))
+    columnas, estadisticas = csv_json.get_csv_info(df)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=columnas)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=estadisticas)
 
     archivo_json = csv_json.csv_to_json(df, filepath)
     await context.bot.send_document(chat_id=update.effective_chat.id, document=open(archivo_json, "rb"))

@@ -1,14 +1,12 @@
 import logging
 import os
-import json
-import csv
-import requests
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from apis import meteoAPI, jokeAPI, apodAPI
 from csv_json import csv_json
 from scraping import periodico, cartelera
+from sql import inferno
 
 load_dotenv()
 # Authentication to manage the bot
@@ -74,12 +72,8 @@ async def handle_json(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
     portada = periodico.scrapping_periodico()
     for noticia in portada:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{noticia['titular']}\n{noticia['enlace']}")
-
-async def handle_noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    portada = periodico.scrapping_periodico()
-    for noticia in portada:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{noticia['titular']}\n{noticia['enlace']}")
+        await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                       text=f"{noticia['titular']}\n{noticia['enlace']}")
 
 async def handle_peliculas(update: Update, context: ContextTypes.DEFAULT_TYPE):
     peliculas_hoy = cartelera.scrapping_periodico()
@@ -88,6 +82,10 @@ async def handle_peliculas(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                      photo=pelicula["imagen"],
                                      caption=f"{pelicula['titulo']}\n{pelicula['enlace']}")
 
+async def handle_inferno(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    condena = inferno.chamando_a_satanas()
+    await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                   text=f"Nombre: {condena[1]}\nNivel: {condena[2]}\nPecado: {condena[3]}")
 
 if __name__ == '__main__':
     # Start the application to operate the bot
@@ -111,6 +109,9 @@ if __name__ == '__main__':
 
     peliculas_handler = CommandHandler('peliculas', handle_peliculas)
     application.add_handler(peliculas_handler)
+
+    inferno_handler = CommandHandler('inferno', handle_inferno)
+    application.add_handler(inferno_handler)
 
     csv_handler = MessageHandler(filters.Document.FileExtension("csv"), handle_csv)
     application.add_handler(csv_handler)

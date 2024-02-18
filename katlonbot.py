@@ -43,12 +43,30 @@ async def apod_api(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file = await context.bot.get_file(update.message.document)
-    filename = update.message.document.file_name
-    await file.download_to_drive(filename)
+    filepath = "downloads/" + update.message.document.file_name
+    await file.download_to_drive(filepath)
+
+    df = csv_json.convert_to_dataframe(filepath)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=csv_json.get_csv_info(df))
+
+    archivo_json = csv_json.csv_to_json(df, filepath)
+    await context.bot.send_document(chat_id=update.effective_chat.id, document=open(archivo_json, "rb"))
+
+    os.remove(filepath)
+    os.remove(archivo_json)
 
 async def handle_json(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    json_file = update.message.document.get_file()
-    json_data = json.loads(json_file.decode('utf-8'))
+    file = await context.bot.get_file(update.message.document)
+    filepath = "downloads/" + update.message.document.file_name
+    await file.download_to_drive(filepath)
+    
+    df = csv_json.convert_to_dataframe(filepath)
+
+    archivo_csv = csv_json.json_to_csv(df, filepath)
+    await context.bot.send_document(chat_id=update.effective_chat.id, document=open(archivo_csv, "rb"))
+
+    os.remove(filepath)
+    os.remove(archivo_csv)
     
 
 if __name__ == '__main__':

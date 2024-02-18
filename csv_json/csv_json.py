@@ -16,6 +16,9 @@ def csv_to_json(dataframe, ruta):
     return nueva_ruta
 
 def get_csv_info(archivo_csv):
+    #Como info no devuelve un string, sino que imprime la información directamente, 
+    #crearemos un buffer para que escriba en el la salida y así poder recuperarla con
+    #get_values. Despúes la parsearemos y la retornamos 
     buffer = io.StringIO()
     archivo_csv.info(buf=buffer)
     info_output = buffer.getvalue().splitlines()[2:-2]
